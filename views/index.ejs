@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Plataforma Educativa IOT</title>
+    <link rel="shortcut icon" href="/img/tuercas.png">
+
+    
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="css/dashboard.css" rel="stylesheet">
+  </head>
+  <body>
+    
+<header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+  <a class="navbar-brand col-md-3 col-lg-3 me-0 px-3" href="#">
+    <img style="padding: 0 8px;" src="/img/logo.png" width="300" height="45" class="d-inline-block align-text-top">
+  </a>
+  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="navbar-nav">
+    <div class="nav-item text-nowrap">
+      <div class="btn-group me-2">
+        <% if (user.role == "admin") {%>
+          <a class="px-3 btn btn-secondary" href="export">Export</a>
+        <%}%>
+        <a class="px-3 disabled"></a>
+        <a class="px-3 btn btn-light" href="logout">Logout</a>
+        <a class="px-3 disabled"></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="row">
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 ">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Graficos</h1>
+        <h1>Bienvenido:
+          <% if (user) {%>
+            <span class="badge bg-success"><%= user.username %></span>
+          <%}%>
+        </h1>
+      </div>
+        <div id="page-content" >
+            <div class="row" style="margin-top:20px; margin-bottom:20px">
+                <div class="col-4">
+                    <select class="form-select" aria-label="Default select example" id="tipografico" onchange="agregarGrafico">
+                        <option selected disabled>Seleccionar tipo de Graficos</option>
+                        <option value="line">Lineal</option>
+                        <option value="bubble">Burbuja</option>
+                        <option value="bar">Barra</option>
+                        <option value="radar">Radar</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row" style="margin-top:5px; margin-bottom:10px">
+                <div id="canvas" class="col-5" style="border-radius: 12px">
+                    <canvas id="myChart"></canvas>
+                </div>
+                <div class="col-1"></div>
+                <div id="canvas1" class="col-5" style="border-radius: 12px">
+                    <canvas id="myChart1"></canvas>
+                </div>
+            </div>
+            <div class="row" style="margin-top:5px; margin-bottom:10px">
+                <div id="canvas2" class="col-5" style="border-radius: 12px">
+                    <canvas id="myChart2"></canvas>
+                </div>
+                <div class="col-1"></div>
+                <div id="canvas3" class="col-5" style="border-radius: 12px">
+                    <canvas id="myChart3"></canvas>
+                </div>
+            </div>
+            <br>
+            <div class="row" style="margin-top:5px; margin-bottom:10px">
+                <div id="canvas4" class="col-5" style="border-radius: 12px">
+                    <canvas id="myChart4"></canvas>
+                </div>
+                <div class="col-1"></div>
+                <div id="canvas5" class="col-5" style="border-radius: 12px">
+                    <canvas id="myChart5"></canvas>
+                </div>
+            </div>
+        
+      </div>
+    </main>
+  </div>
+</div>
+
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/socket.io/socket.io.js"></script>    
+    <script>
+      $("#canvas").hide();
+      $("#canvas1").hide();
+      $("#canvas2").hide();
+      $("#canvas3").hide();
+      $("#canvas4").hide();
+      $("#canvas5").hide();
+
+      
+
+      document.querySelector('#tipografico').addEventListener("change",agregarGrafico);
+
+      let idCanvas = 0;
+      function agregarGrafico(event) {
+          const socket = io();
+                      let count = 0;
+              
+                      socket.on('data',(dataTemp) =>{
+                          console.log(dataTemp);
+                          myChart.data.labels.push(count);
+                          myChart.data.datasets.forEach(dataset => {
+                              dataset.data.push(dataTemp.value);
+                          });
+                          count ++;
+                          myChart.update();
+                      });
+          const value = event.target.value
+
+          console.log(value)
+          console.log("------------------")
+          console.log(idCanvas)
+
+
+          switch (idCanvas) {
+              case 0:
+                      
+                      $("#canvas").show();
+                      $('#canvas').addClass('border border-danger');
+                      var ctx = document.getElementById('myChart').getContext('2d');
+                      var myChart = new Chart(ctx, {
+                      type: value,
+                      data: {
+                          labels: ['Temp'],
+                          datasets: [{
+                              label: 'Temperatura',
+                              data: [],
+                              backgroundColor: [
+                                  'rgba(54, 162, 235, 0.2)'
+                              ],
+                              borderColor: [
+                                  'rgba(54, 162, 235, 1)'
+                              ]
+                          }]
+                      },
+                      options: {}
+                  });
+                  idCanvas ++;
+                  break;
+              case 1:
+                      $("#canvas1").show();
+                      $('#canvas1').addClass('border border-danger');
+                      var ctx1 = document.getElementById('myChart1').getContext('2d');
+                      var myChart = new Chart(ctx1, {
+                      type: value,
+                      data: {
+                          labels: ['Temp'],
+                          datasets: [{
+                              label: 'Temperatura',
+                              data: [],
+                              backgroundColor: [
+                                  'rgba(255, 0, 0, 0.2)'
+                              ],
+                              borderColor: [
+                                  'rgba(255, 0,0, 1)'
+                              ]
+                          }]
+                      },
+                      options: {}
+                  });
+                  idCanvas ++;
+                  break;
+              case 2:
+                      $("#canvas2").show();
+                      $('#canvas2').addClass('border border-danger');
+                      var ctx2 = document.getElementById('myChart2').getContext('2d');
+                      var myChart = new Chart(ctx2, {
+                          type: value,
+                          data: {
+                              datasets: [{
+                                  label: 'Temperatura',
+                                  data: [],
+                                  backgroundColor: [
+                                      'rgba(255, 87, 51 ,0.5)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(255, 255, 0, 0.8)'
+                                  ]
+                              }]
+                          },
+                          options: {}
+                      });
+                      idCanvas ++;
+                  break;
+              case 3:
+                      $("#canvas3").show();
+                      $('#canvas3').addClass('border border-danger');
+                      var ctx3 = document.getElementById('myChart3').getContext('2d');
+                      var myChart = new Chart(ctx3, {
+                          type: value,
+                          data: {
+                              datasets: [{
+                                  label: 'Temperatura',
+                                  data: [],
+                                  backgroundColor: [
+                                      'rgba(11, 83, 69, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(20, 132, 73, 1)'
+                                  ]
+                              }]
+                          },
+                          options: {}
+                      });
+                      idCanvas ++;
+                  break;
+              case 4:
+                      $("#canvas4").show();
+                      $('#canvas4').addClass('border border-danger');
+                      var ctx4 = document.getElementById('myChart4').getContext('2d');
+                      var myChart = new Chart(ctx4, {
+                          type: value,
+                          data: {
+                              datasets: [{
+                                  label: 'Temperatura',
+                                  data: [],
+                                  backgroundColor: [
+                                      'rgba(3, 15, 189,0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(23, 15, 189, 1)'
+                                  ]
+                              }]
+                          },
+                          options: {}
+                      });
+                      idCanvas ++;
+                  break;
+              case 5:
+                      $("#canvas5").show();
+                      $('#canvas5').addClass('border border-danger');
+                      var ctx5 = document.getElementById('myChart5').getContext('2d');
+                      var myChart = new Chart(ctx5, {
+                          type: value,
+                          data: {
+                              datasets: [{
+                                  label: 'Temperatura',
+                                  data: [],
+                                  backgroundColor: [
+                                      'rgba(218, 247, 166, 0.2)'
+                                  ],
+                                  borderColor: [
+                                      'rgba(218, 247, 166, 1)'
+                                  ]
+                              }]
+                          },
+                          options: {}
+                      });
+                      idCanvas ++;
+                  break;
+              default:
+                  console.log('Ya no se puede agregar mas graficos!');
+          }
+
+      }
+
+  
+  </script>
+  
+  </body>
+</html>

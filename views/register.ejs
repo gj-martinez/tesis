@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Plataforma Educativa IOT</title>
+    <link rel="shortcut icon" href="/img/tuercas.png">
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="/css/signin.css" rel="stylesheet">
+  </head>
+
+  <style>
+    body{
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom:40px;
+        background-color: rgba(255,255,255,0.95)
+    }
+  </style>
+
+  <body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8  shadow-lg p-3 mb-5">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-center text-light">REGISTRARSE</div>
+                <div class="card-body text-primary">
+                    <form action="/register" method="POST">
+                        <div class="mb-3">
+                            <label for="name">Nombre</label>
+                            <input type="text" class="form-control" id="name" name="name" aria-describedby="emailhelp">
+                        </div>
+                        <div class="mb-3">
+                            <label for="user">Cuenta usuario</label>
+                            <input type="text" class="form-control" id="user" name="user">
+                        </div>
+                        <div class="mb-3 form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" id="roles" name="roles">
+                            <label class="form-check-label" for="roles">Profesor</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pass">Password</label>
+                            <input type="password" class="form-control" id="pass" name="pass" >
+                        </div>
+                    </div>
+                    <div class="card-footer text-center bg-transparent border-primary">
+                        <a href="/" type="button" class="btn btn-secondary">Cancelar</a>
+                        <button class="btn btn-success" type="submit">Registrar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
