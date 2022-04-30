@@ -73,14 +73,14 @@
                 <div class="col s6">
                   <label class="form-label" for="autoSizingInput"></label>
                   <div class="input-group">
-                    <button type="submit" id="bSubmit"class="btn btn-success" style="margin-top: 20px;">Enviar</button>
+                    <button type="button" id="bSubmit"class="btn btn-success" style="margin-top: 20px;">Enviar</button>
                   </div>
                   
                 </div>
               </form>
       </div>
-      <div class="row" style="margin-top:5px; margin-bottom:10px">
-        <div id="canvas" class="col-5" style="border-radius: 12px">
+      <div class="row" style="margin-top:90px; margin-bottom:10px">
+        <div id="canvas" class="col-10" style="border-radius: 12px">
             <canvas id="myChart"></canvas>
         </div>
     </div>
@@ -92,42 +92,64 @@
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>    
     <script>
-     const bSubmit = document.querySelector('#bSubmit');
-
+        const bSubmit = document.querySelector('#bSubmit');
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                datasets: [{
+                    label: 'Temperatura',
+                    data: [],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.2)'
+                        ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)'
+                        ]
+                      }]
+                    },
+                      options: {}
+            });
         bSubmit.addEventListener('click', async () => {
-        let fechaDesde = document.querySelector('#fechaDesde').value
-        let fechaHasta = document.querySelector('#fechaHasta').value
-        let flag = false
+          let fechaDesde = document.querySelector('#fechaDesde').value
+          let fechaHasta = document.querySelector('#fechaHasta').value
+          let flag = false
 
-        if(fechaDesde === '' || fechaHasta === ''){
-          flag = true
-          alert('campos vacios')
-        }/*
-        $.ajax({
-          url: '/getMetric',
-          method: 'GET',
-          contentType: 'application/json',
-          data: JSON.stringify({fechaDesde: fechaDesde, fechaHasta:fechaHasta}),
-          success: function(res){
-            alert(res);
+          if(fechaDesde === '' || fechaHasta === ''){
+            flag = true
+            alert('campos vacios')
           }
-        })*/
-       
-        const data = {fechaDesde, fechaHasta}
-        const options = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data),
-        }
+          
+          const data = {fechaDesde, fechaHasta}
+          const options = {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+          }
 
-        const response = await fetch('/getMetric',options)
-        const json = await response.json()
-        console.log("despues de fetch")
-        console.log(json)
+          fetch('/getMetric',options)
+            .then(response => response.json())
+            .then(datos => mostrar(datos))
+            .catch(error => console.log(error))
+
+          const mostrar = (datos) => {
+            if(datos.status === 200){
+              datos.data.forEach(elem => {
+                var fecha = moment(elem.created).format('DD-MM-YYYY')
+                myChart.data[`labels`].push(fecha);
+                myChart.data[`datasets`][0].data.push(elem.value)
+                myChart.update();
+              })
+            }
+            console.log(myChart.data)
+          }
+
+
       })
     </script>
   

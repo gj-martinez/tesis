@@ -105,26 +105,26 @@ exports.logout = function(req, res){
     return res.redirect('/')
 }
 
-exports.getMetric = function(req, res){
+exports.getMetric = async function(req, res){
    /* 
    
     const user = req.body.fechaDesde
     const pass = req.body.fechaHasta    
 
-    console.log(req.body)
     console.log(user + " - "+ pass)
     console.log(req.body)
 
     */
-    console.log("llega aca ---" )
+    console.log(req.body);
+    console.log("llega aca ---");
 
-    let metrics = []
-    conexion.query('SELECT type,value, created FROM metric', async (error, results) =>{
-        if(!results){return res.json({data : []})}
-        metrics =results       
+    await conexion.query('SELECT type,value, created FROM metric', async (error, results) =>{
+        if(!results){return res.json({status: 400, data : []})}     
+        metrics = JSON.stringify(results);
+        res.json({
+            status : 200,
+            data : results
+        }) 
     })
-    res.json({
-        status : 200,
-        data : metrics
-    })
+    
 }
