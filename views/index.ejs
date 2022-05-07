@@ -43,7 +43,7 @@
   <div class="navbar-nav">
     <div class="nav-item text-nowrap">
       <div class="btn-group me-2">
-        <% if (user.role == "admin") {%>
+        <% if (user.rol == "admin") {%>
           <a class="px-3 btn btn-secondary" href="export">Exportar</a>
         <%}%>
         <a class="px-3 disabled"></a>
@@ -61,7 +61,7 @@
         <h1 class="h2">Graficos</h1>
         <h1>Bienvenido:
           <% if (user) {%>
-            <span class="badge bg-success"><%= user.username %></span>
+            <span class="badge bg-success"><%= user.nombreUsuario %></span>
           <%}%>
         </h1>
       </div>

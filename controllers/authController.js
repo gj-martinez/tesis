@@ -17,7 +17,7 @@ exports.register = async (req, res, next) =>{
         let passHash = await bcryptjs.hash(pass,8)
         let fecha = new Date()
 
-        conexion.query('INSERT INTO user SET ?',{name: name, username: user, password: passHash,connect: true,created: fecha, updated: fecha, role: role},(error, result) => {
+        conexion.query('INSERT INTO Usuarios SET ?',{nombre: name, nombreUsuario: user, password: passHash,createdAt: fecha,rol: role},(error, result) => {
             if (error) {console.log(error)}
             res.redirect('/')
         })
@@ -42,7 +42,7 @@ exports.login = async (req, res) => {
                 ruta: 'login'
             })
         }else{
-            conexion.query('SELECT * FROM user WHERE username = ?', [user], async (error, results) =>{
+            conexion.query('SELECT * FROM Usuarios WHERE nombreUsuario = ?', [user], async (error, results) =>{
                 if(results.length == 0 || !(await bcryptjs.compare(pass, results[0].password))){
                     res.render('login',{
                         alert:true,
@@ -86,8 +86,9 @@ exports.isAuthenticated = async (req, res, next) => {
     if (req.cookies.jwt){
         try {
             const decodificada = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRETO)
-            conexion.query('SELECT * FROM user WHERE id = ?', [decodificada.id], (err, result) => {
+            conexion.query('SELECT * FROM Usuarios WHERE id = ?', [decodificada.id], (err, result) => {
                 if(!result){return next()}
+                
                 req.user = result[0]
                 return next()
             })
@@ -118,7 +119,7 @@ exports.getMetric = async function(req, res){
     console.log(req.body);
     console.log("llega aca ---");
 
-    await conexion.query('SELECT type,value, created FROM metric', async (error, results) =>{
+    conexion.query('SELECT tipo,valor, createdAt FROM Metricas', (error, results) =>{
         if(!results){return res.json({status: 400, data : []})}     
         metrics = JSON.stringify(results);
         res.json({

@@ -23,7 +23,7 @@ const pool = mysql.createPool({
 
 function insert(pool, data,callback){
     try {
-        let insertQuery = "INSERT INTO `tesis`.`metric` (`id_user`, `type`, `value`, `created`) VALUES (?, ?,?, ?)"
+        let insertQuery = "INSERT INTO `Metricas` (`UsuarioId`, `tipo`, `valor`, `createdAt`) VALUES (?, ?,?, ?)"
         let query = mysql.format(insertQuery,[data.user_id,data.topic,data.value,data.created])
         console.log(data)
         pool.getConnection(function(err, connection) {
@@ -72,7 +72,9 @@ let usuarioConetado = [];
 
 //router para las vistas
 app.get('/', authController.isAuthenticated,(req, res)=>{    
+
     usuarioConetado = req.user
+
     res.render("index",{user: req.user})
 })
 app.get('/login', (req, res)=>{
@@ -92,7 +94,9 @@ app.get('/export', (req, res)=>{
 //router para los metos del controlador
 app.post('/register',authController.register)
 app.post('/login',authController.login)
-app.get('/logout',authController.logout)
+app.get('/logout',authController.logout, (req, res)=> {
+    usuarioConetado = []
+})
 app.post('/getMetric',authController.getMetric)
 
 
@@ -115,24 +119,25 @@ client.on('message', function (topic, message) {
     try {
         // message is Buffer
         const fecha = new Date();
-        const añoActual = fecha.getFullYear();
-        const hoy = fecha.getDate();
-        const mesActual = fecha.getMonth() + 1; 
-        //console.log("La temperatura del dia "+hoy+"/"+mesActual+"/"+añoActual +" - "+ message.toString())
+
         io.emit('data',{
             value: message.toString()
         });
-        insert(
-            pool,
-            {
-                user_id: usuarioConetado.id,
-                topic:topic,
-                value:message.toString(),
-                created:fecha
-            },
-            (result) => {
-                //console.log(result)
-        });
+
+        if(usuarioConetado.id > 0 && usuarioConetado.rol === "user"){
+            insert(
+                pool,
+                {
+                    user_id: usuarioConetado.id,
+                    topic:topic,
+                    value:message.toString(),
+                    created:fecha
+                },
+                (result) => {
+                    //console.log(result)
+            });
+        }
+        
         //client.end()
     } catch (error) {
         console.error(error)

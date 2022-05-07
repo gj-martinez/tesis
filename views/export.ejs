@@ -58,19 +58,30 @@
       </div>
         <div id="page-content" >
               <form id="fecha"class="row gy-2 gx-3 align-items-center">
-                <div class="col s6">
+                <div class="col s4">
                   <label class="form-label">Fecha Desde</label>
                   <div class="input-group">
                     <input type="date" id="fechaDesde" class="form-control" id="autoSizingInputGroup">
                   </div>
                 </div>
-                <div class="col s6">
+                <div class="col s4">
                   <label class="form-label">Fecha hasta</label>
                   <div class="input-group">
                     <input type="date" id="fechaHasta" class="form-control" id="autoSizingInputGroup">
                   </div>
                 </div>
-                <div class="col s6">
+                <div class="col s2">
+                  <label class="form-label">Usuario</label>
+                  <div class="input-group">
+                    <select name="select">
+                      <option value="" Selected disabled>Seleccionar Usuario</option>
+                      <option value="value1">Value 1</option>
+                      <option value="value2">Value 2</option>
+                      <option value="value3">Value 3</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col s4">
                   <label class="form-label" for="autoSizingInput"></label>
                   <div class="input-group">
                     <button type="button" id="bSubmit"class="btn btn-success" style="margin-top: 20px;">Enviar</button>
@@ -140,13 +151,12 @@
           const mostrar = (datos) => {
             if(datos.status === 200){
               datos.data.forEach(elem => {
-                var fecha = moment(elem.created).format('DD-MM-YYYY')
+                var fecha = moment(elem.createdAt).format('DD-MM-YYYY')
                 myChart.data[`labels`].push(fecha);
-                myChart.data[`datasets`][0].data.push(elem.value)
+                myChart.data[`datasets`][0].data.push(elem.valor)
                 myChart.update();
               })
             }
-            console.log(myChart.data)
           }
 
 
