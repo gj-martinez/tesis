@@ -94,6 +94,17 @@
         <div id="canvas" class="col-10" style="border-radius: 12px">
             <canvas id="myChart"></canvas>
         </div>
+        <div class="row" style="margin-top:5px; margin-bottom:10px">
+          <div id="canvas2" class="col-4" style="border-radius: 12px">
+              <canvas id="myChart1"></canvas>
+          </div>
+          <div id="canvas3" class="col-4" style="border-radius: 12px">
+            <canvas id="myChart2"></canvas>
+        </div>
+          <div id="canvas4" class="col-4" style="border-radius: 12px">
+              <canvas id="myChart3"></canvas>
+          </div>
+      </div>
     </div>
     </main>
   </div>
@@ -108,22 +119,10 @@
     <script>
         const bSubmit = document.querySelector('#bSubmit');
         var ctx = document.getElementById('myChart').getContext('2d');
-        var myChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                datasets: [{
-                    label: 'Temperatura',
-                    data: [],
-                    backgroundColor: [
-                        'rgba(54, 162, 235, 0.2)'
-                        ],
-                    borderColor: [
-                        'rgba(54, 162, 235, 1)'
-                        ]
-                      }]
-                    },
-                      options: {}
-            });
+        var ctx1 = document.getElementById('myChart1').getContext('2d');
+        var ctx2 = document.getElementById('myChart2').getContext('2d');
+        var ctx3 = document.getElementById('myChart3').getContext('2d');
+        
         bSubmit.addEventListener('click', async () => {
           let fechaDesde = document.querySelector('#fechaDesde').value
           let fechaHasta = document.querySelector('#fechaHasta').value
@@ -142,13 +141,37 @@
             },
             body: JSON.stringify(data),
           }
+          
 
-          fetch('/getMetric',options)
+          metricAll(options);
+          metricMax(options);
+          metricAvg(options);
+          metricMin(options);
+      })
+      
+    const metricAll = (options) =>{
+      var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                datasets: [{
+                    label: 'Temperatura',
+                    data: [],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.2)'
+                        ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)'
+                        ]
+                      }]
+                    },
+                      options: {}
+      });
+      
+      fetch('/getMetric',options)
             .then(response => response.json())
             .then(datos => mostrar(datos))
             .catch(error => console.log(error))
-
-          const mostrar = (datos) => {
+      const mostrar = (datos) => {
             if(datos.status === 200){
               datos.data.forEach(elem => {
                 var fecha = moment(elem.createdAt).format('DD-MM-YYYY')
@@ -157,11 +180,127 @@
                 myChart.update();
               })
             }
-          }
+      }
+    }
+
+    const metricMax = (options) => {
+        var myChart = new Chart(ctx1, {
+          type: 'bar',
+          data: {
+            labels: ['Temp'],
+            datasets: [{
+              label: 'Temperatura Maxima',
+              data: [],
+              backgroundColor: [
+                'rgba(255, 0, 0, 0.2)'
+                ],
+              borderColor: [
+                'rgba(255, 0,0, 1)'
+                ]
+                }]
+                },
+              options: {}
+        });
+
+        fetch('/getMetricMax',options)
+            .then(response => response.json())
+            .then(datos => mostrar(datos))
+            .catch(error => console.log(error))
+
+      const mostrar = (datos) => {
+            if(datos.status === 200){
+              console.log(datos)
+              datos.data.forEach(elem => {
+                var fecha = moment(elem.createdAt).format('DD-MM-YYYY')
+                myChart.data[`labels`].push(fecha);
+                myChart.data[`datasets`][0].data.push(elem.valor)
+                myChart.update();
+              })
+            }
+      }
+    
+    }
+    
 
 
-      })
+    const metricAvg = (options) => {
+        var myChart = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: ['Temp'],
+            datasets: [{
+              label: 'Temperatura Promedio',
+              data: [],
+              backgroundColor: [
+                'rgba(3, 15, 189,0.2)'
+              ],
+              borderColor: [
+                'rgba(23, 15, 189, 1)'
+              ]
+                }]
+                },
+              options: {}
+        });
+
+        fetch('/getMetricAvg',options)
+            .then(response => response.json())
+            .then(datos => mostrar(datos))
+            .catch(error => console.log(error))
+
+      const mostrar = (datos) => {
+            if(datos.status === 200){
+              console.log(datos)
+              datos.data.forEach(elem => {
+                var fecha = moment(elem.createdAt).format('DD-MM-YYYY')
+                myChart.data[`labels`].push(fecha);
+                myChart.data[`datasets`][0].data.push(elem.valor)
+                myChart.update();
+              })
+            }
+      }
+    
+    }
+    
+    const metricMin = (options) => {
+        var myChart = new Chart(ctx3, {
+          type: 'bar',
+          data: {
+            labels: ['Temp'],
+            datasets: [{
+              label: 'Temperatura Minima',
+              data: [],
+              backgroundColor: [
+                'rgba(11, 83, 69, 0.2)'
+              ],
+              borderColor: [
+                'rgba(20, 132, 73, 1)'
+              ]
+                }]
+                },
+              options: {}
+        });
+
+        fetch('/getMetricMin',options)
+            .then(response => response.json())
+            .then(datos => mostrar(datos))
+            .catch(error => console.log(error))
+
+      const mostrar = (datos) => {
+            if(datos.status === 200){
+              console.log(datos)
+              datos.data.forEach(elem => {
+                var fecha = moment(elem.createdAt).format('DD-MM-YYYY')
+                myChart.data[`labels`].push(fecha);
+                myChart.data[`datasets`][0].data.push(elem.valor)
+                myChart.update();
+              })
+            }
+      }
+    
+    }
+    
+    
     </script>
   
-  </body>
+  </body>|
 </html>

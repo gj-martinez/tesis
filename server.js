@@ -98,6 +98,9 @@ app.get('/logout',authController.logout, (req, res)=> {
     usuarioConetado = []
 })
 app.post('/getMetric',authController.getMetric)
+app.post('/getMetricMax',authController.getMetricMax)
+app.post('/getMetricMin',authController.getMetricMin)
+app.post('/getMetricAvg',authController.getMetricAvg)
 
 
 app.use(function(req, res, next) {
