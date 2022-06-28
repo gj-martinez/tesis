@@ -94,6 +94,7 @@ exports.isAuthenticated = async (req, res, next) => {
             })
         } catch (error) {
             console.log(error)
+            res.redirect('/login')
             return next()
         }
     }else{
@@ -116,10 +117,11 @@ exports.getMetric = async function(req, res){
     console.log(req.body)
 
     */
-    console.log(req.body);
-    console.log("llega aca ---");
+    console.log("llega getMetric");
 
-    conexion.query('SELECT tipo,valor, createdAt FROM Metricas', (error, results) =>{
+    console.log(req.body);
+
+    conexion.query('SELECT tipo,valor, createdAt FROM Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
         if(!results){return res.json({status: 400, data : []})}     
         metrics = JSON.stringify(results);
         res.json({
@@ -143,7 +145,7 @@ exports.getMetricMax = async function(req, res){
      console.log(req.body);
      console.log("llega aca Max ---");
  
-     conexion.query('SELECT Max(valor) FROM tesis.Metricas where usuarioId = 2', (error, results) =>{
+     conexion.query('SELECT Max(valor) FROM tesis.Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
          if(!results){return res.json({status: 400, data : []})}     
          console.log(results)
          res.json({
@@ -167,7 +169,7 @@ exports.getMetricMax = async function(req, res){
      console.log(req.body);
      console.log("llega aca Min ---");
  
-     conexion.query('SELECT Min(valor) FROM tesis.Metricas where usuarioId = 2;', (error, results) =>{
+     conexion.query('SELECT Min(valor) FROM tesis.Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
          if(!results){return res.json({status: 400, data : []})}     
          console.log(results)
          res.json({
@@ -191,7 +193,22 @@ exports.getMetricMax = async function(req, res){
      console.log(req.body);
      console.log("llega aca Avg---");
  
-     conexion.query('SELECT FORMAT(AVG(valor), 2) FROM tesis.Metricas where usuarioId = 2', (error, results) =>{
+     conexion.query('SELECT FORMAT(AVG(valor), 2) FROM tesis.Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
+         if(!results){return res.json({status: 400, data : []})}     
+         console.log(results)
+         res.json({
+             status : 200,
+             data : results
+         }) 
+     })
+     
+ }
+
+ exports.getUser = async function(req, res){
+
+     console.log("llega aca User---");
+ 
+     conexion.query('SELECT id, nombreUsuario from Usuarios', (error, results) =>{
          if(!results){return res.json({status: 400, data : []})}     
          console.log(results)
          res.json({

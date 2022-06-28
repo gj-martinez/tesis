@@ -101,6 +101,7 @@ app.post('/getMetric',authController.getMetric)
 app.post('/getMetricMax',authController.getMetricMax)
 app.post('/getMetricMin',authController.getMetricMin)
 app.post('/getMetricAvg',authController.getMetricAvg)
+app.get('/getUser',authController.getUser)
 
 
 app.use(function(req, res, next) {
