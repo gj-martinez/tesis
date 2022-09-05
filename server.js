@@ -21,10 +21,11 @@ const pool = mysql.createPool({
     password: '1234'
 })
 
+
 function insert(pool, data,callback){
     try {
-        let insertQuery = "INSERT INTO `Metricas` (`UsuarioId`, `tipo`, `valor`, `createdAt`) VALUES (?, ?,?, ?)"
-        let query = mysql.format(insertQuery,[data.user_id,data.topic,data.value,data.created])
+        let insertQuery = "INSERT INTO `Metricas` (`UsuarioId`, `tipo`, `valor`, `fecha`,`hora`,`createdAt`) VALUES (?, ?,?, ?)"
+        let query = mysql.format(insertQuery,[data.user_id,data.topic,data.value,data.fecha,data.hora,data.created])
         console.log(data)
         pool.getConnection(function(err, connection) {
             if (err) throw err;
@@ -122,7 +123,15 @@ client.on('connect', function () {
 client.on('message', function (topic, message) {
     try {
         // message is Buffer
-        const fecha = new Date();
+        date = new Date();
+		año = date.getFullYear();
+		mes = date.getMonth() + 1;
+		dia = date.getDate();
+		hora = ('0'+date.getHours()).slice(-2);
+		minuto = ('0'+date.getMinutes()).slice(-2);
+		segundo = ('0'+date.getSeconds()).slice(-2);
+		fecha = año+"-"+mes+"-"+dia;
+        time = hora+":"+minuto+":"+segundo;
 
         io.emit('data',{
             value: message.toString()
@@ -135,7 +144,9 @@ client.on('message', function (topic, message) {
                     user_id: usuarioConetado.id,
                     topic:topic,
                     value:message.toString(),
-                    created:fecha
+                    fecha:fecha,
+                    hora:time,
+                    created:date
                 },
                 (result) => {
                     //console.log(result)
