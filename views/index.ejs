@@ -135,7 +135,6 @@
                       let count = 0;
               
                       socket.on('data',(dataTemp) =>{
-                          console.log(dataTemp);
                           myChart.data.labels.push(count);
                           myChart.data.datasets.forEach(dataset => {
                               dataset.data.push(dataTemp.value);
@@ -144,11 +143,6 @@
                           myChart.update();
                       });
           const value = event.target.value
-
-          console.log(value)
-          console.log("------------------")
-          console.log(idCanvas)
-
 
           switch (idCanvas) {
               case 0:

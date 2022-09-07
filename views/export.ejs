@@ -54,7 +54,7 @@
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 ">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Reporte</h1>
-        <a class="px-3 btn btn-danger" href="">Descargar</a>
+        <a class="px-3 btn btn-danger" id="bDescargar">Descargar</a>
       </div>
         <div id="page-content" >
               <form id="fecha"class="row gy-2 gx-3 align-items-center">
@@ -73,7 +73,7 @@
                 <div class="col s2">
                   <label class="form-label">Usuario</label>
                   <div class="input-group">
-                    <select name="select" id="selectUser">
+                    <select class="form-select" name="select" id="selectUser">
                       <option value="" Selected disabled>Seleccionar Usuario</option>
                     </select>
                   </div>
@@ -87,19 +87,19 @@
                 </div>
               </form>
       </div>
-      <div class="row" style="margin-top:90px; margin-bottom:10px">
-        <div id="canvas" class="col-10" style="border-radius: 12px">
-            <canvas id="myChart"></canvas>
-        </div>
-        <div class="row" style="margin-top:5px; margin-bottom:10px">
-          <div id="canvas2" class="col-4" style="border-radius: 12px">
-              <canvas id="myChart1"></canvas>
+      <div id="reportPage">
+          <div id="chartContainer" style="width: 30%;float: left;">
+            <canvas id="myChart1"></canvas>
           </div>
-          <div id="canvas3" class="col-4" style="border-radius: 12px">
+          <div style="width: 30%; float: left;">
             <canvas id="myChart2"></canvas>
-        </div>
-          <div id="canvas4" class="col-4" style="border-radius: 12px">
-              <canvas id="myChart3"></canvas>
+          </div>
+          <div style="width: 30%; float: left;">
+            <canvas id="myChart3"></canvas>
+          </div>
+          <br/><br/><br/>
+          <div style="width: 70%; height: 500px;">
+            <canvas id="myChart"></canvas>
           </div>
       </div>
     </div>
@@ -112,16 +112,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.debug.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="/socket.io/socket.io.js"></script>    
     <script>
         const bSubmit = document.querySelector('#bSubmit');
+        const bDescargar = document.querySelector('#bDescargar');
+        
         const $select = document.querySelector("#selectUser");
         var ctx = document.getElementById('myChart').getContext('2d');
         var ctx1 = document.getElementById('myChart1').getContext('2d');
         var ctx2 = document.getElementById('myChart2').getContext('2d');
         var ctx3 = document.getElementById('myChart3').getContext('2d');
+        var myChart;
+        var myChartMax;
+        var myChartAvg;
+        var myChartMin;
         getUser();
         function getUser(){
           fetch('/getUser')
@@ -146,7 +152,7 @@
           let userSelect = document.getElementById("selectUser");
           let user = userSelect.value;
           let flag = false
-
+          
           if(fechaDesde === '' || fechaHasta === ''){
             flag = true
             return Swal.fire({
@@ -178,20 +184,64 @@
           metricAvg(options);
           metricMin(options);
       })
-      
+        bDescargar.addEventListener('click',() => {
+            // get size of report page
+            var reportPageHeight = $('#reportPage').innerHeight();
+            var reportPageWidth = $('#reportPage').innerWidth();
+
+            // create a new canvas object that we will populate with all other canvas objects
+            var pdfCanvas = $('<canvas />').attr({
+              id: "canvaspdf",
+              width: reportPageWidth,
+              height: reportPageHeight
+            });
+            
+            // keep track canvas position
+            var pdfctx = $(pdfCanvas)[0].getContext('2d');
+            var pdfctxX = 10;
+            var pdfctxY = 200;
+            var buffer = 100;
+            
+            // for each chart.js chart
+            $("canvas").each(function(index) {
+              // get the chart height/width
+              var canvasHeight = $(this).innerHeight();
+              var canvasWidth = $(this).innerWidth();
+              
+              // draw the chart into the new canvas
+              pdfctx.drawImage($(this)[0], pdfctxX, pdfctxY, canvasWidth, canvasHeight);
+              pdfctxX += canvasWidth + buffer;
+              
+              // our report page is in a grid pattern so replicate that in the new canvas
+              if (index % 2 === 1) {
+                pdfctxX = 0;
+                pdfctxY += canvasHeight + buffer;
+              }
+            });
+            
+            // create new pdf and add our new canvas as an image
+            var pdf = new jsPDF('l', 'pt', [reportPageWidth, reportPageHeight]);
+            pdf.addImage($(pdfCanvas)[0], 'PNG', 0, 0);
+            
+            // download the pdf
+            pdf.save('filename.pdf');
+        })
         const metricAll = (options) =>{
-          var myChart = new Chart(ctx, {
+          if(myChart){
+            myChart.destroy();
+          }
+          myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     datasets: [{
                         label: 'Temperatura',
                         data: [],
                         backgroundColor: [
-                            'rgba(54, 162, 235, 0.2)'
-                            ],
-                        borderColor: [
-                            'rgba(54, 162, 235, 1)'
-                            ]
+                        'rgba(255, 0, 0, 0.2)'
+                        ],
+                      borderColor: [
+                        'rgba(255, 0,0, 1)'
+                        ]
                           }]
                         },
                           options: {}
@@ -204,8 +254,8 @@
           const mostrar = (datos) => {
                 if(datos.status === 200){
                   datos.data.forEach(elem => {
-                    var fecha = moment(elem.createdAt).format('DD-MM-YYYY')
-                    myChart.data[`labels`].push(fecha);
+                    var date = moment(elem.fecha).format('DD-MM-YYYY')
+                    myChart.data[`labels`].push(date);
                     myChart.data[`datasets`][0].data.push(elem.valor)
                     myChart.update();
                   })
@@ -214,18 +264,20 @@
         }
 
         const metricMax = (options) => {
-            var myChart = new Chart(ctx1, {
+            if(myChartMax){
+              myChartMax.destroy();
+            }
+            myChartMax = new Chart(ctx1, {
               type: 'bar',
               data: {
-                labels: ['Temp'],
                 datasets: [{
                   label: 'Temperatura Maxima',
                   data: [],
                   backgroundColor: [
-                    'rgba(255, 0, 0, 0.2)'
+                    'rgba(255, 165, 0, 0.2)'
                     ],
                   borderColor: [
-                    'rgba(255, 0,0, 1)'
+                    'rgba(255,165,0, 1)'
                     ]
                     }]
                     },
@@ -239,12 +291,10 @@
 
           const mostrar = (datos) => {
                 if(datos.status === 200){
-                  console.log(datos)
                   datos.data.forEach(elem => {
-                    var fecha = moment(elem.createdAt).format('DD-MM-YYYY')
-                    myChart.data[`labels`].push(fecha);
-                    myChart.data[`datasets`][0].data.push(elem.valor)
-                    myChart.update();
+                    myChartMax.data[`labels`].push('Fecha maxima: ' + elem.maximo +'°');
+                    myChartMax.data[`datasets`][0].data.push(elem.maximo)
+                    myChartMax.update();
                   })
                 }
           }
@@ -252,10 +302,12 @@
         }
         
         const metricAvg = (options) => {
-            var myChart = new Chart(ctx2, {
+            if(myChartAvg){
+              myChartAvg.destroy();
+            }
+            myChartAvg = new Chart(ctx2, {
               type: 'bar',
               data: {
-                labels: ['Temp'],
                 datasets: [{
                   label: 'Temperatura Promedio',
                   data: [],
@@ -277,12 +329,10 @@
 
           const mostrar = (datos) => {
                 if(datos.status === 200){
-                  console.log(datos)
                   datos.data.forEach(elem => {
-                    var fecha = moment(elem.createdAt).format('DD-MM-YYYY')
-                    myChart.data[`labels`].push(fecha);
-                    myChart.data[`datasets`][0].data.push(elem.valor)
-                    myChart.update();
+                    myChartAvg.data[`labels`].push('Fecha promedio: '+ elem.promedio+'°');
+                    myChartAvg.data[`datasets`][0].data.push(elem.promedio)
+                    myChartAvg.update();
                   })
                 }
           }
@@ -290,10 +340,12 @@
         }
         
         const metricMin = (options) => {
-            var myChart = new Chart(ctx3, {
+            if(myChartMin){
+              myChartMin.destroy();
+            }
+            var myChartMin = new Chart(ctx3, {
               type: 'bar',
               data: {
-                labels: ['Temp'],
                 datasets: [{
                   label: 'Temperatura Minima',
                   data: [],
@@ -315,22 +367,17 @@
 
             const mostrar = (datos) => {
                   if(datos.status === 200){
-                    console.log(datos)
                     datos.data.forEach(elem => {
-                      var fecha = moment(elem.createdAt).format('DD-MM-YYYY')
-                      myChart.data[`labels`].push(fecha);
-                      myChart.data[`datasets`][0].data.push(elem.valor)
-                      myChart.update();
+                      myChartMin.data[`labels`].push('Fecha minima: '+ elem.minimo+'°');
+                      myChartMin.data[`datasets`][0].data.push(elem.minimo)
+                      myChartMin.update();
                     })
                   }
               }
         
         }
         
-    
-
-    
     </script>
   
-  </body>|
+  </body>
 </html>

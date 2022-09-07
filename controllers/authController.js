@@ -108,20 +108,10 @@ exports.logout = function(req, res){
 }
 
 exports.getMetric = async function(req, res){
-   /* 
-   
-    const user = req.body.fechaDesde
-    const pass = req.body.fechaHasta    
-
-    console.log(user + " - "+ pass)
-    console.log(req.body)
-
-    */
-    console.log("llega getMetric");
-
-    console.log(req.body);
-
-    conexion.query('SELECT tipo,valor, createdAt FROM Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
+    userId = req.body.user;
+    fechaDesde = req.body.fechaDesde;
+    fechaHasta = req.body.fechaHasta;
+    conexion.query('SELECT tipo,valor, fecha,hora,createdAt FROM Metricas WHERE fecha BETWEEN ? AND ? AND usuarioId = ? ', [fechaDesde,fechaHasta,userId], (error, results) =>{
         if(!results){return res.json({status: 400, data : []})}     
         metrics = JSON.stringify(results);
         res.json({
@@ -133,88 +123,45 @@ exports.getMetric = async function(req, res){
 }
 
 exports.getMetricMax = async function(req, res){
-    /* 
-    
-     const user = req.body.fechaDesde
-     const pass = req.body.fechaHasta    
- 
-     console.log(user + " - "+ pass)
-     console.log(req.body)
- 
-     */
-     console.log(req.body);
-     console.log("llega aca Max ---");
- 
-     conexion.query('SELECT Max(valor) FROM tesis.Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
+     conexion.query('SELECT Max(valor) as maximo FROM Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
          if(!results){return res.json({status: 400, data : []})}     
-         console.log(results)
          res.json({
              status : 200,
              data : results
          }) 
      })
      
- }
+}
 
- exports.getMetricMin = async function(req, res){
-    /* 
-    
-     const user = req.body.fechaDesde
-     const pass = req.body.fechaHasta    
- 
-     console.log(user + " - "+ pass)
-     console.log(req.body)
- 
-     */
-     console.log(req.body);
-     console.log("llega aca Min ---");
- 
-     conexion.query('SELECT Min(valor) FROM tesis.Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
+exports.getMetricMin = async function(req, res){
+     conexion.query('SELECT Min(valor) as minimo FROM Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
          if(!results){return res.json({status: 400, data : []})}     
-         console.log(results)
          res.json({
              status : 200,
              data : results
          }) 
      })
      
- }
+}
 
- exports.getMetricAvg = async function(req, res){
-    /* 
-    
-     const user = req.body.fechaDesde
-     const pass = req.body.fechaHasta    
- 
-     console.log(user + " - "+ pass)
-     console.log(req.body)
- 
-     */
-     console.log(req.body);
-     console.log("llega aca Avg---");
- 
-     conexion.query('SELECT FORMAT(AVG(valor), 2) FROM tesis.Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
+exports.getMetricAvg = async function(req, res){
+     conexion.query('SELECT FORMAT(AVG(valor), 2) as promedio FROM Metricas WHERE usuarioId = ?', [req.body.user], (error, results) =>{
          if(!results){return res.json({status: 400, data : []})}     
-         console.log(results)
          res.json({
              status : 200,
              data : results
          }) 
      })
      
- }
+}
 
- exports.getUser = async function(req, res){
-
-     console.log("llega aca User---");
- 
+exports.getUser = async function(req, res){
      conexion.query('SELECT id, nombreUsuario from Usuarios', (error, results) =>{
          if(!results){return res.json({status: 400, data : []})}     
-         console.log(results)
          res.json({
              status : 200,
              data : results
          }) 
      })
      
- }
+}

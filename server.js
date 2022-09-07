@@ -24,9 +24,8 @@ const pool = mysql.createPool({
 
 function insert(pool, data,callback){
     try {
-        let insertQuery = "INSERT INTO `Metricas` (`UsuarioId`, `tipo`, `valor`, `fecha`,`hora`,`createdAt`) VALUES (?, ?,?, ?)"
+        let insertQuery = "INSERT INTO `Metricas` (`UsuarioId`, `tipo`, `valor`, `fecha`,`hora`,`createdAt`) VALUES (?,?,?,?,?,?)"
         let query = mysql.format(insertQuery,[data.user_id,data.topic,data.value,data.fecha,data.hora,data.created])
-        console.log(data)
         pool.getConnection(function(err, connection) {
             if (err) throw err;
             connection.query(query, function(err, result) {
@@ -75,7 +74,7 @@ let usuarioConetado = [];
 app.get('/', authController.isAuthenticated,(req, res)=>{    
 
     usuarioConetado = req.user
-
+    console.log(usuarioConetado)
     res.render("index",{user: req.user})
 })
 app.get('/login', (req, res)=>{
@@ -123,6 +122,7 @@ client.on('connect', function () {
 client.on('message', function (topic, message) {
     try {
         // message is Buffer
+        
         date = new Date();
 		año = date.getFullYear();
 		mes = date.getMonth() + 1;
@@ -138,6 +138,7 @@ client.on('message', function (topic, message) {
         });
 
         if(usuarioConetado.id > 0 && usuarioConetado.rol === "user"){
+            console.log(usuarioConetado)
             insert(
                 pool,
                 {
