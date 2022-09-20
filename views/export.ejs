@@ -54,7 +54,6 @@
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 ">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Reporte</h1>
-        <a class="px-3 btn btn-danger" id="bDescargar">Descargar</a>
       </div>
         <div id="page-content" >
               <form id="fecha"class="row gy-2 gx-3 align-items-center">
@@ -81,14 +80,15 @@
                 <div class="col s4">
                   <label class="form-label" for="autoSizingInput"></label>
                   <div class="input-group">
-                    <button type="button" id="bSubmit"class="btn btn-success" style="margin-top: 20px;">Enviar</button>
+                    <button type="button" id="bSubmit"class="btn btn-success" style="margin-top: 20px;">Buscar</button>
+                    <button type="button" id="bDescargar"class="btn btn-danger" style="margin-top: 20px;">Descargar</button>
                   </div>
-                  
                 </div>
               </form>
       </div>
+      
       <div id="reportPage">
-          <div id="chartContainer" style="width: 30%;float: left;">
+          <div style="width: 30%;float: left;">
             <canvas id="myChart1"></canvas>
           </div>
           <div style="width: 30%; float: left;">
@@ -97,10 +97,10 @@
           <div style="width: 30%; float: left;">
             <canvas id="myChart3"></canvas>
           </div>
-          <br/><br/><br/>
-          <div style="width: 70%; height: 500px;">
+          <div style="width: 85%;">
             <canvas id="myChart"></canvas>
           </div>
+          <br></br>
       </div>
     </div>
     </main>
@@ -124,10 +124,12 @@
         var ctx1 = document.getElementById('myChart1').getContext('2d');
         var ctx2 = document.getElementById('myChart2').getContext('2d');
         var ctx3 = document.getElementById('myChart3').getContext('2d');
+
         var myChart;
         var myChartMax;
         var myChartAvg;
         var myChartMin;
+
         getUser();
         function getUser(){
           fetch('/getUser')
@@ -185,22 +187,22 @@
           metricMin(options);
       })
         bDescargar.addEventListener('click',() => {
+            let userSelect = document.getElementById("selectUser");
+            groupName = userSelect.options[userSelect.selectedIndex].text
             // get size of report page
-            var reportPageHeight = $('#reportPage').innerHeight();
-            var reportPageWidth = $('#reportPage').innerWidth();
-
+            
             // create a new canvas object that we will populate with all other canvas objects
             var pdfCanvas = $('<canvas />').attr({
               id: "canvaspdf",
-              width: reportPageWidth,
-              height: reportPageHeight
+              width: 1200,
+              height: 1200
             });
             
             // keep track canvas position
             var pdfctx = $(pdfCanvas)[0].getContext('2d');
-            var pdfctxX = 10;
-            var pdfctxY = 200;
-            var buffer = 100;
+            var pdfctxX = 0;
+            var pdfctxY = 0;
+            var buffer = 30;
             
             // for each chart.js chart
             $("canvas").each(function(index) {
@@ -213,18 +215,20 @@
               pdfctxX += canvasWidth + buffer;
               
               // our report page is in a grid pattern so replicate that in the new canvas
-              if (index % 2 === 1) {
+              if (index === 2) {
                 pdfctxX = 0;
                 pdfctxY += canvasHeight + buffer;
               }
             });
             
             // create new pdf and add our new canvas as an image
-            var pdf = new jsPDF('l', 'pt', [reportPageWidth, reportPageHeight]);
-            pdf.addImage($(pdfCanvas)[0], 'PNG', 0, 0);
+            var pdf = new jsPDF('landscape');
+            pdf.addImage($(pdfCanvas)[0], 'PNG', 15, 25);
+            pdf.setFontSize(40);
+            pdf.text(90,15,'Resultado final');
             
             // download the pdf
-            pdf.save('filename.pdf');
+            pdf.save('grupo_'+groupName+'_reporteFinal.pdf');
         })
         const metricAll = (options) =>{
           if(myChart){
@@ -234,7 +238,7 @@
                 type: 'bar',
                 data: {
                     datasets: [{
-                        label: 'Temperatura',
+                        label: 'Temperatura Total',
                         data: [],
                         backgroundColor: [
                         'rgba(255, 0, 0, 0.2)'
@@ -292,7 +296,7 @@
           const mostrar = (datos) => {
                 if(datos.status === 200){
                   datos.data.forEach(elem => {
-                    myChartMax.data[`labels`].push('Fecha maxima: ' + elem.maximo +'°');
+                    myChartMax.data[`labels`].push('Temperatura maxima: ' + elem.maximo +'°');
                     myChartMax.data[`datasets`][0].data.push(elem.maximo)
                     myChartMax.update();
                   })
@@ -330,7 +334,7 @@
           const mostrar = (datos) => {
                 if(datos.status === 200){
                   datos.data.forEach(elem => {
-                    myChartAvg.data[`labels`].push('Fecha promedio: '+ elem.promedio+'°');
+                    myChartAvg.data[`labels`].push('Temperatura promedio: '+ elem.promedio+'°');
                     myChartAvg.data[`datasets`][0].data.push(elem.promedio)
                     myChartAvg.update();
                   })
@@ -368,7 +372,7 @@
             const mostrar = (datos) => {
                   if(datos.status === 200){
                     datos.data.forEach(elem => {
-                      myChartMin.data[`labels`].push('Fecha minima: '+ elem.minimo+'°');
+                      myChartMin.data[`labels`].push('Temperatura minima: '+ elem.minimo+'°');
                       myChartMin.data[`datasets`][0].data.push(elem.minimo)
                       myChartMin.update();
                     })
