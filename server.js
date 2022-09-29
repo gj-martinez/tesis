@@ -74,7 +74,6 @@ let usuarioConetado = [];
 app.get('/', authController.isAuthenticated,(req, res)=>{    
 
     usuarioConetado = req.user
-    console.log(usuarioConetado)
     res.render("index",{user: req.user})
 })
 app.get('/login', (req, res)=>{
