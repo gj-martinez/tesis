@@ -93,7 +93,6 @@ exports.isAuthenticated = async (req, res, next) => {
                 return next()
             })
         } catch (error) {
-            console.log(error)
             res.redirect('/login')
             return next()
         }

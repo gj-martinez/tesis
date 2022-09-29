@@ -87,10 +87,6 @@ app.get('/register', (req, res)=>{
 app.get('/export', (req, res)=>{
     res.render("export")
 })
-/*app.post('/getMetric',(req, res)=> {
-    console.log("llega aca")
-    console.log(req)
-})*/
 //router para los metos del controlador
 app.post('/register',authController.register)
 app.post('/login',authController.login)
@@ -113,9 +109,9 @@ app.use(function(req, res, next) {
 
 client.on('connect', function () {
     client.subscribe('temperatura', function (err) {
-      if (err) {
-        console.log("Hubo un error")
-      }
+        if (err) {
+            console.log("Hubo un error")
+        }
     })
 })
 
@@ -149,9 +145,7 @@ client.on('message', function (topic, message) {
                     hora:time,
                     created:date
                 },
-                (result) => {
-                    //console.log(result)
-            });
+            );
         }
         
         //client.end()
