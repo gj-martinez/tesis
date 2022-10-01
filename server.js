@@ -1,24 +1,24 @@
 const express = require('express');
-const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const mysql = require("mysql")
 const app = require('express')();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const mqtt = require('mqtt')
-const router = express.Router();
-
-
 const authController = require('./controllers/authController')
+
+const dotenv = require('dotenv');
+dotenv.config()
 //const conexion = require('../database/db')
 
+const port = process.env.PORT || 3000;
 
 
 const pool = mysql.createPool({
-    host: 'localhost',
-    database:'tesis',
-    user: 'root',
-    password: '1234'
+    host: process.env.DB_HOST || 'localhost',
+    database: process.env.DB_NAME || 'tesis',
+    user: process.env.DB_USERNAME || 'root',
+    password: process.env.DB_PASSWORD || '1234'
 })
 
 
@@ -43,7 +43,7 @@ function insert(pool, data,callback){
 const client  = mqtt.connect('mqtt://192.168.0.95')
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+    console.log('a user connected');
 });
 
 //seteamos el motor de plantillas
@@ -133,7 +133,6 @@ client.on('message', function (topic, message) {
         });
 
         if(usuarioConetado.id > 0 && usuarioConetado.rol === "user"){
-            console.log(usuarioConetado)
             insert(
                 pool,
                 {
@@ -144,6 +143,9 @@ client.on('message', function (topic, message) {
                     hora:time,
                     created:date
                 },
+                (result) => {
+                    //console.log(result)
+                }
             );
         }
         
@@ -154,6 +156,6 @@ client.on('message', function (topic, message) {
 })
 
 
-server.listen(3000,()=>{
-    console.log('listening on port 3000');
+server.listen(port,()=>{
+    console.log(`listening on port ${port}`);
 });

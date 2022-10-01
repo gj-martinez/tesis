@@ -155,7 +155,7 @@ exports.getMetricAvg = async function(req, res){
 }
 
 exports.getUser = async function(req, res){
-     conexion.query('SELECT id, nombreUsuario from Usuarios', (error, results) =>{
+     conexion.query('SELECT id, nombreUsuario from Usuarios where rol = "user"', (error, results) =>{
          if(!results){return res.json({status: 400, data : []})}     
          res.json({
              status : 200,
