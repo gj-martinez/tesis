@@ -6,7 +6,6 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 const mqtt = require('mqtt')
 const authController = require('./controllers/authController')
-
 const dotenv = require('dotenv');
 dotenv.config()
 //const conexion = require('../database/db')
