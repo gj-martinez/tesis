@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mysql = require("mysql")
 const app = require('express')();
@@ -39,8 +40,9 @@ function insert(pool, data,callback){
     }
 }
 
-const client  = mqtt.connect('mqtt://192.168.0.95')
-
+//const client  = mqtt.connect('mqtt://192.168.0.95')
+//const client  = mqtt.connect('mqtt://172.20.10.10')
+const client  = mqtt.connect('mqtt://test.mosquitto.org')
 io.on('connection', (socket) => {
     console.log('a user connected');
 });
@@ -63,6 +65,7 @@ dotenv.config({path: './env/.env'})
 
 //seatemos las cookies
 app.use(cookieParser())
+app.use(cors());
 
 //llamar al router
 
@@ -113,10 +116,10 @@ client.on('connect', function () {
     })
 })
 
+
 client.on('message', function (topic, message) {
     try {
         // message is Buffer
-        
         date = new Date();
 		año = date.getFullYear();
 		mes = date.getMonth() + 1;
@@ -132,6 +135,7 @@ client.on('message', function (topic, message) {
         });
 
         if(usuarioConetado.id > 0 && usuarioConetado.rol === "user"){
+
             insert(
                 pool,
                 {
@@ -153,7 +157,6 @@ client.on('message', function (topic, message) {
         console.error(error)
     }
 })
-
 
 server.listen(port,()=>{
     console.log(`listening on port ${port}`);
