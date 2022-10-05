@@ -119,6 +119,12 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
     try {
+
+
+        data = message.toString().slice(14, 20).replace(/[^0-9]+/g, "")
+        lasIndex = message.toString().lastIndexOf("}")
+        grupoId = message.toString().slice(19, lasIndex).replace(/[^0-9]+/g, "");
+
         // message is Buffer
         date = new Date();
 		año = date.getFullYear();
@@ -129,9 +135,9 @@ client.on('message', function (topic, message) {
 		segundo = ('0'+date.getSeconds()).slice(-2);
 		fecha = año+"-"+mes+"-"+dia;
         time = hora+":"+minuto+":"+segundo;
-
+        
         io.emit('data',{
-            value: message.toString()
+            value: data
         });
 
         if(usuarioConetado.id > 0 && usuarioConetado.rol === "user"){
@@ -139,9 +145,9 @@ client.on('message', function (topic, message) {
             insert(
                 pool,
                 {
-                    user_id: usuarioConetado.id,
+                    user_id: grupoId,
                     topic:topic,
-                    value:message.toString(),
+                    value:data,
                     fecha:fecha,
                     hora:time,
                     created:date
@@ -151,7 +157,6 @@ client.on('message', function (topic, message) {
                 }
             );
         }
-        
         //client.end()
     } catch (error) {
         console.error(error)
