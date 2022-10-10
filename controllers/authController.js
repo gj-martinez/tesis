@@ -88,7 +88,6 @@ exports.isAuthenticated = async (req, res, next) => {
             const decodificada = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRETO)
             conexion.query('SELECT * FROM Usuarios WHERE id = ?', [decodificada.id], (err, result) => {
                 if(!result){return next()}
-                
                 req.user = result[0]
                 return next()
             })
@@ -155,12 +154,22 @@ exports.getMetricAvg = async function(req, res){
 }
 
 exports.getUser = async function(req, res){
-     conexion.query('SELECT id, nombreUsuario from Usuarios where rol = "user"', (error, results) =>{
-         if(!results){return res.json({status: 400, data : []})}     
-         res.json({
-             status : 200,
-             data : results
-         }) 
-     })
-     
+    conexion.query('SELECT id, nombreUsuario from Usuarios where rol = "user"', (error, results) =>{
+        if(!results){return res.json({status: 400, data : []})}     
+        res.json({
+            status : 200,
+            data : results
+        }) 
+    })
+}
+
+exports.getGroupMetric = async function(req, res){
+    fecha = req.body.fecha;
+    conexion.query('select m.UsuarioId, count(*) as total , u.nombreUsuario from Metricas as m inner join Usuarios as u on m.UsuarioId = u.id where  fecha = ? group by UsuarioId', [fecha],(error, results) =>{
+        if(!results){return res.json({status: 400, data : []})}     
+        res.json({
+            status : 200,
+            data : results
+        }) 
+    })
 }

@@ -94,6 +94,7 @@ app.post('/login',authController.login)
 app.get('/logout',authController.logout, (req, res)=> {
     usuarioConetado = []
 })
+app.post('/getGroupMetric',authController.getGroupMetric)
 app.post('/getMetric',authController.getMetric)
 app.post('/getMetricMax',authController.getMetricMax)
 app.post('/getMetricMin',authController.getMetricMin)
@@ -119,7 +120,6 @@ client.on('connect', function () {
 
 client.on('message', function (topic, message) {
     try {
-
 
         data = message.toString().slice(14, 20).replace(/[^0-9]+/g, "")
         lasIndex = message.toString().lastIndexOf("}")

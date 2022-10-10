@@ -55,60 +55,87 @@
 </header>
 
 <div class="container">
-  <div class="row">
-    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 ">
-      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Graficos</h1>
-        <h1>Bienvenido:
-          <% if (user) {%>
-            <span class="badge bg-success"><%= user.nombreUsuario %></span>
-          <%}%>
-        </h1>
-      </div>
-        <div id="page-content" >
-            <div class="row" style="margin-top:20px; margin-bottom:20px">
-                <div class="col-4">
-                    <select class="form-select" aria-label="Default select example" id="tipografico" onchange="agregarGrafico">
-                        <option selected disabled>Seleccionar tipo de Graficos</option>
-                        <option value="line">Lineal</option>
-                        <option value="bubble">Burbuja</option>
-                        <option value="bar">Barra</option>
-                        <option value="radar">Radar</option>
-                    </select>
-                </div>
+    <div class="row">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 ">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <% if (user.rol == "admin") {%>
+                    <h1 class="h2">Panel Administración</h1>
+                <%} else {%>
+                    <h1 class="h2">Graficos</h1>
+                <%}%>
+                <h3>Bienvenido:
+                    <% if (user) {%>
+                    <span class="badge bg-success"><%= user.nombreUsuario %></span>
+                    <%}%>
+                </h3>
             </div>
-            <div class="row" style="margin-top:5px; margin-bottom:10px">
-                <div id="canvas" class="col-5" style="border-radius: 12px">
-                    <canvas id="myChart"></canvas>
+            <% if (user.rol == "admin") {%>
+                <div id="page-content" >
+                    <div class="row">
+                        <div class="col-4 s4">
+                            <label class="form-label">Fecha</label>
+                            <div class="input-group">
+                                <input type="date" id="fecha" class="form-control" onchange="buscarInfo(event);">
+                            </div>
+                        </div>
+                        <br>
+                        <div class="col-lg-6 mb-4" id="infoGroup">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Total de información guardada por grupo</h6>
+                                </div>
+                                <div class="card-body" id="cardBody">
+                                    <div id="newRow">
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-1"></div>
-                <div id="canvas1" class="col-5" style="border-radius: 12px">
-                    <canvas id="myChart1"></canvas>
+            <%} else {%>
+                <div id="page-content" >
+                    <div class="row" style="margin-top:20px; margin-bottom:20px">
+                        <div class="col-4">
+                            <select class="form-select" aria-label="Default select example" id="tipografico" onchange="agregarGrafico(event)">
+                                <option selected disabled>Seleccionar tipo de Graficos</option>
+                                <option value="line">Lineal</option>
+                                <option value="bubble">Burbuja</option>
+                                <option value="bar">Barra</option>
+                                <option value="radar">Radar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:5px; margin-bottom:10px">
+                        <div id="canvas" class="col-5" style="border-radius: 12px">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                        <div class="col-1"></div>
+                        <div id="canvas1" class="col-5" style="border-radius: 12px">
+                            <canvas id="myChart1"></canvas>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:5px; margin-bottom:10px">
+                        <div id="canvas2" class="col-5" style="border-radius: 12px">
+                            <canvas id="myChart2"></canvas>
+                        </div>
+                        <div class="col-1"></div>
+                        <div id="canvas3" class="col-5" style="border-radius: 12px">
+                            <canvas id="myChart3"></canvas>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row" style="margin-top:5px; margin-bottom:10px">
+                        <div id="canvas4" class="col-5" style="border-radius: 12px">
+                            <canvas id="myChart4"></canvas>
+                        </div>
+                        <div class="col-1"></div>
+                        <div id="canvas5" class="col-5" style="border-radius: 12px">
+                            <canvas id="myChart5"></canvas>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="row" style="margin-top:5px; margin-bottom:10px">
-                <div id="canvas2" class="col-5" style="border-radius: 12px">
-                    <canvas id="myChart2"></canvas>
-                </div>
-                <div class="col-1"></div>
-                <div id="canvas3" class="col-5" style="border-radius: 12px">
-                    <canvas id="myChart3"></canvas>
-                </div>
-            </div>
-            <br>
-            <div class="row" style="margin-top:5px; margin-bottom:10px">
-                <div id="canvas4" class="col-5" style="border-radius: 12px">
-                    <canvas id="myChart4"></canvas>
-                </div>
-                <div class="col-1"></div>
-                <div id="canvas5" class="col-5" style="border-radius: 12px">
-                    <canvas id="myChart5"></canvas>
-                </div>
-            </div>
-        
-      </div>
-    </main>
-  </div>
+            <%}%>
+        </main>
+    </div>
 </div>
 
 
@@ -124,17 +151,79 @@
       $("#canvas3").hide();
       $("#canvas4").hide();
       $("#canvas5").hide();
-
+      $("#infoGroup").hide();
+      
       
 
-      document.querySelector('#tipografico').addEventListener("change",agregarGrafico);
+      //document.querySelector('#tipografico').addEventListener("change",agregarGrafico);
+    
+    function buscarInfo(event){
+        $('#newRow').remove();
+        let fecha = document.querySelector('#fecha').value
+        $("#infoGroup").show();
+        const data = {fecha}
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+        }
 
-      let idCanvas = 0;
-      function agregarGrafico(event) {
-          const socket = io();
-                      let count = 0;
-              
-                      socket.on('data',(dataTemp) =>{
+        fetch('/getGroupMetric',options)
+            .then(response => response.json())
+            .then(datos => mostrar(datos))
+            .catch(error => console.log(error))
+        
+        const mostrar = (datos) => {
+            console.log(datos)
+            let child = $('newRow');
+            child.remove();
+
+            let aContainer = document.createElement('div');
+            aContainer.setAttribute('id', 'newRow');
+            document.getElementById('cardBody').appendChild(aContainer);
+            if(datos.data.length > 0){
+                datos.data.forEach(elem => {
+                    var html = '';
+                    html += `<h4 class="small font-weight-bold">Nombre de grupo: ${elem.nombreUsuario}`;
+                    html += `<span class="float-center"></span></h4>`;
+                    html += '<div class="progress mb-4" style="height: 20px">';
+                    html += '<div class=""';
+                    html += `style="width:100%"`;
+                    html += 'role="progressbar"';
+                    html += `aria-valuenow="${elem.total}"`;
+                    html += `aria-valuemin="0" `;
+                    html += `aria-valuemax="">Total: ${elem.total}</div>`;
+                    html += ` </div>`;
+                    html += ` </div>`;
+                    $('#newRow').append(html);
+                })
+            }else{
+                var html = '';
+                    html += `<h4 class="small font-weight-bold">Sin grupos`;
+                    html += `<span class="float-center"></span></h4>`;
+                    html += '<div class="progress mb-4" style="height: 20px">';
+                    html += '<div class=""';
+                    html += `style="width:100%"`;
+                    html += 'role="progressbar"';
+                    html += `aria-valuenow="20"`;
+                    html += `aria-valuemin="0" `;
+                    html += `aria-valuemax="">Total: 0</div>`;
+                    html += ` </div>`;
+                    html += ` </div>`;
+                    $('#newRow').append(html);
+            }
+            
+        }
+    }
+
+
+    let idCanvas = 0;
+    function agregarGrafico(event) {
+        const socket = io();
+                    let count = 0;
+                    socket.on('data',(dataTemp) =>{
                           myChart.data.labels.push(count);
                           myChart.data.datasets.forEach(dataset => {
                               dataset.data.push(dataTemp.value);
@@ -286,8 +375,7 @@
 
       }
 
-  
-  </script>
-  
-  </body>
+    </script>
+
+</body>
 </html>
