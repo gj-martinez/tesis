@@ -64,8 +64,12 @@
                     <h1 class="h2">Graficos</h1>
                 <%}%>
                 <h3>Bienvenido:
-                    <% if (user) {%>
-                    <span class="badge bg-success"><%= user.nombreUsuario %></span>
+                    <% if (user.rol == "admin") {%>
+                    <span class="badge bg-success">Profesor</span>
+                    <%} else {%>
+                        <span class="badge bg-success"><%= user.nombreUsuario %></span>
+                        <span class="badge bg-warning"><%= user.id %></span>
+
                     <%}%>
                 </h3>
             </div>

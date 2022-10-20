@@ -14,6 +14,43 @@ exports.register = async (req, res, next) =>{
         const name = req.body.name
         const user = req.body.user
         const pass = req.body.pass    
+
+        console.log(req.body)
+
+        if(name === ""){
+            return res.render('register',{
+                alert:true,
+                alertTitle: "Advertencia",
+                alertMessage: "Debe ingresar un nombre",
+                alertIcon: "info",
+                showConfirmButton:true,
+                timer:15000,
+                ruta: 'register'
+            })
+        }
+        if(user === ""){
+            return res.render('register',{
+                alert:true,
+                alertTitle: "Advertencia",
+                alertMessage: "Debe ingresar un nombre de usuario",
+                alertIcon: "info",
+                showConfirmButton:true,
+                timer:15000,
+                ruta: 'register'
+            })
+        }
+        if(pass === ""){
+            return res.render('register',{
+                alert:true,
+                alertTitle: "Advertencia",
+                alertMessage: "Debe ingresar una contraseña",
+                alertIcon: "info",
+                showConfirmButton:true,
+                timer:15000,
+                ruta: 'register'
+            })
+        }
+
         let passHash = await bcryptjs.hash(pass,8)
         let fecha = new Date()
 

@@ -82,7 +82,7 @@ app.get('/login', (req, res)=>{
     res.render("login",{alert:false})
 })
 app.get('/register', (req, res)=>{
-    res.render("register")
+    res.render("register",{alert:false})
 })
 
 app.get('/export', (req, res)=>{
@@ -139,9 +139,7 @@ client.on('message', function (topic, message) {
         io.emit('data',{
             value: data
         });
-
-        if(usuarioConetado.id > 0 && usuarioConetado.rol === "user"){
-
+        if(usuarioConetado.id > 0 && usuarioConetado.rol === "user" && grupoId !== ""){
             insert(
                 pool,
                 {
